@@ -1,0 +1,366 @@
+/* Reset et variables */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Palette chaude, sobre */
+  --fond: #f9f5f0;
+  --surface: #ffffff;
+  --surface-alt: #f2ece4;
+  --accent: #c8663a;
+  --accent-pale: #f3dfd3;
+  --texte: #1e1714;
+  --texte-sec: #6b5a50;
+  --bord: #e2d5ca;
+  --vert: #3a7a4e;
+  --rouge: #b63a2a;
+  --ombre: 0 1px 3px rgba(0,0,0,0.08);
+  --rayon: 12px;
+  --rayon-btn: 48px;
+  font-size: 16px;
+}
+
+body {
+  background: var(--fond);
+  color: var(--texte);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+/* Cibles tactiles min 48px (WCAG 2.2) */
+button, a, input, select {
+  min-height: 48px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font: inherit;
+  border-radius: var(--rayon-btn);
+  padding: 0 1.5rem;
+  transition: opacity 0.15s;
+}
+
+button:active { opacity: 0.8; }
+
+/* Layout principal */
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navigation basse */
+.nav-basse {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border-top: 1px solid var(--bord);
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 100;
+}
+
+.nav-basse a {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--texte-sec);
+  font-size: 0.7rem;
+  gap: 4px;
+  padding: 8px 0;
+  min-height: 56px;
+}
+
+.nav-basse a.actif {
+  color: var(--accent);
+}
+
+.nav-basse a svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Page content */
+.page {
+  flex: 1;
+  padding: 1rem;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+
+/* En-tête de page */
+.entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.entete h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Cartes */
+.carte {
+  background: var(--surface);
+  border-radius: var(--rayon);
+  padding: 1.25rem;
+  box-shadow: var(--ombre);
+  margin-bottom: 0.75rem;
+}
+
+.carte-accent {
+  background: var(--accent);
+  color: white;
+}
+
+/* Chiffre principal */
+.chiffre-principal {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.chiffre-principal span {
+  font-size: 1.2rem;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+/* Boutons */
+.btn-principal {
+  width: 100%;
+  background: var(--accent);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.875rem 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn-secondaire {
+  width: 100%;
+  background: var(--surface-alt);
+  color: var(--texte);
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.875rem 1.5rem;
+}
+
+.btn-danger {
+  background: var(--rouge);
+  color: white;
+}
+
+/* Pavé numérique */
+.pave {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.pave button {
+  background: var(--surface-alt);
+  font-size: 1.5rem;
+  font-weight: 600;
+  aspect-ratio: 1;
+  border-radius: var(--rayon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pave button:active {
+  background: var(--accent-pale);
+}
+
+/* Champ nombre affiché */
+.champ-nombre {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 700;
+  padding: 1rem;
+  background: var(--surface-alt);
+  border-radius: var(--rayon);
+  min-height: 80px;
+}
+
+/* Indicateurs */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: var(--surface-alt);
+  color: var(--texte-sec);
+}
+
+.badge.hors-ligne {
+  background: var(--accent-pale);
+  color: var(--accent);
+}
+
+.badge.ok {
+  background: #d4f0dc;
+  color: var(--vert);
+}
+
+/* Liste de mouvements */
+.mouvement-ligne {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid var(--bord);
+}
+
+.mouvement-ligne:last-child { border-bottom: none; }
+
+.mouvement-type {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--texte-sec);
+}
+
+.mouvement-valeur {
+  font-weight: 600;
+}
+
+/* Formulaire */
+.champ {
+  margin-bottom: 1rem;
+}
+
+.champ label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--texte-sec);
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.champ input, .champ select {
+  width: 100%;
+  border: 1.5px solid var(--bord);
+  border-radius: var(--rayon);
+  padding: 0.75rem 1rem;
+  font: inherit;
+  background: var(--surface);
+  color: var(--texte);
+  outline: none;
+}
+
+.champ input:focus, .champ select:focus {
+  border-color: var(--accent);
+}
+
+/* États vides / chargement / erreur */
+.etat-vide {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--texte-sec);
+}
+
+.etat-vide .icone { font-size: 3rem; margin-bottom: 1rem; }
+
+.etat-chargement {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--bord);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.etat-erreur {
+  background: #fdf0ee;
+  border: 1.5px solid var(--rouge);
+  border-radius: var(--rayon);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Grille de stats */
+.grille-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  background: var(--surface);
+  border-radius: var(--rayon);
+  padding: 1rem;
+  box-shadow: var(--ombre);
+}
+
+.stat .etiquette {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--texte-sec);
+  margin-bottom: 0.25rem;
+}
+
+.stat .valeur {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Titre de section */
+.titre-section {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--texte-sec);
+  font-weight: 600;
+  margin: 1.25rem 0 0.5rem;
+}
+
+/* Barre de progression des parts */
+.barre-part {
+  height: 6px;
+  background: var(--surface-alt);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.barre-part-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+}
