@@ -1,4 +1,5 @@
-const BASE = import.meta.env.VITE_API_URL || '/api'
+const API_HOST = import.meta.env.VITE_API_HOST?.trim()
+const BASE = import.meta.env.VITE_API_URL || (API_HOST ? `https://${API_HOST}/api` : '/api')
 
 // Cache local pour le mode hors ligne
 const CACHE_KEY = 'elevage_cache'
