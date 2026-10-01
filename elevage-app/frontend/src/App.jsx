@@ -11,6 +11,18 @@ import { Parametres } from './pages/Parametres.jsx'
 export default function App() {
   return (
     <BrowserRouter>
+      <aside
+        role="note"
+        style={{
+          background: '#fff3cd',
+          color: '#664d03',
+          padding: '0.75rem 1rem',
+          textAlign: 'center',
+          fontSize: '0.875rem',
+        }}
+      >
+        Démonstration publique : les données sont partagées. N’y saisissez aucune donnée réelle.
+      </aside>
       <Routes>
         <Route path="/" element={<Aujourd_hui />} />
         <Route path="/arrivages/nouveau" element={<NouvelArrivage />} />
