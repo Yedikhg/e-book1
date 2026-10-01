@@ -9,7 +9,7 @@ Cette application web aide à suivre l’activité d’un élevage : arrivages, 
 ## Accès direct aux fichiers
 
 - [Tout le code de l’application](./elevage-app/)
-- [Démarrage et commandes du projet — Makefile](./elevage-app/Makefile)
+- [Commandes du projet — Makefile](./elevage-app/Makefile)
 - [Exemple de configuration — .env.example](./elevage-app/.env.example)
 - [Interface web — frontend](./elevage-app/frontend/)
 - [Écran « Aujourd’hui »](./elevage-app/frontend/src/pages/Aujourd_hui.jsx)
@@ -42,7 +42,7 @@ elevage-app/
 │       └── utils/               Fonctions utilitaires et API
 ├── scripts/                     Sauvegarde et retour arrière
 ├── .env.example                 Exemple de variables locales
-└── Makefile                     Commandes de développement et de test
+└── Makefile                     Commandes de développement
 ```
 
 ## Technologies
@@ -53,15 +53,21 @@ elevage-app/
 
 ## Lancer le projet en local
 
-Depuis le dossier `elevage-app/`, installe d’abord PostgreSQL et Go. La base doit être configurée avant de lancer l’API.
+Depuis le dossier du dépôt, initialise d’abord la base PostgreSQL. Remplace les valeurs d’exemple par celles de ta base :
 
 ```bash
 cd elevage-app
 make migrate DB_URL="postgres://UTILISATEUR:MOT_DE_PASSE@HOTE:5432/BASE?sslmode=require"
-make dev-back DB_URL="postgres://UTILISATEUR:MOT_DE_PASSE@HOTE:5432/BASE?sslmode=require"
 ```
 
-Dans un autre terminal :
+Dans un premier terminal, démarre l’API :
+
+```bash
+cd elevage-app/backend
+DATABASE_URL="postgres://UTILISATEUR:MOT_DE_PASSE@HOTE:5432/BASE?sslmode=require" go run ./cmd/api/main.go
+```
+
+Dans un second terminal, démarre l’interface :
 
 ```bash
 cd elevage-app/frontend
@@ -69,4 +75,10 @@ npm install
 npm run dev
 ```
 
-Consulte le [Makefile](./elevage-app/Makefile) et le fichier [`.env.example`](./elevage-app/.env.example) pour les commandes et paramètres disponibles. Ne publie jamais de vrais mots de passe ou clés dans GitHub.
+Le fichier Vite configure déjà le relais des appels `/api` vers l’API locale sur le port 8080. Consulte le [Makefile](./elevage-app/Makefile) et le fichier [`.env.example`](./elevage-app/.env.example) pour les paramètres disponibles.
+
+## État du projet et sécurité
+
+Le dépôt contient le code source de l’application; cela ne signifie pas encore que l’application est déployée. Le contrôle d’utilisateur actuel repose sur l’en-tête `X-User-ID` et une valeur de test par défaut. **N’utilise pas cette version avec des données réelles ou confidentielles avant d’ajouter une authentification et des contrôles d’accès adaptés.**
+
+Ne publie jamais de vrais mots de passe ou clés dans GitHub.
