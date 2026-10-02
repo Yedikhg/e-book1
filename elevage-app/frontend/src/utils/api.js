@@ -1,5 +1,6 @@
-const API_HOST = import.meta.env.VITE_API_HOST?.trim()
-const BASE = import.meta.env.VITE_API_URL || (API_HOST ? `https://${API_HOST}/api` : '/api')
+const ENV = import.meta.env || {}
+const API_HOST = ENV.VITE_API_HOST?.trim()
+const BASE = ENV.VITE_API_URL || (API_HOST ? `https://${API_HOST}/api` : '/api')
 
 // Cache local pour le mode hors ligne
 const CACHE_KEY = 'elevage_cache'
@@ -36,7 +37,8 @@ const FILE_ATTENTE_KEY = 'elevage_queue'
 
 export function lireFileAttente() {
   try {
-    return JSON.parse(localStorage.getItem(FILE_ATTENTE_KEY) || '[]')
+    const file = JSON.parse(localStorage.getItem(FILE_ATTENTE_KEY) || '[]')
+    return Array.isArray(file) ? file : []
   } catch {
     return []
   }
@@ -45,9 +47,13 @@ export function lireFileAttente() {
 function ajouterFileAttente(requete) {
   try {
     const file = lireFileAttente()
-    file.push({ ...requete, id: Date.now() })
+    file.push({ ...requete, id: identifiantRequete(), userId: idUtilisateur() })
     localStorage.setItem(FILE_ATTENTE_KEY, JSON.stringify(file))
   } catch {}
+}
+
+function identifiantRequete() {
+  return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
 
 export function viderFileAttente() {
@@ -125,24 +131,52 @@ export function formatCts(cts) {
 }
 
 // Synchroniser la file d'attente quand le réseau revient
-export async function synchroniser() {
+let synchronisationEnCours = null
+
+export function synchroniser() {
+  if (synchronisationEnCours) return synchronisationEnCours
+  synchronisationEnCours = synchroniserFile().finally(() => {
+    synchronisationEnCours = null
+  })
+  return synchronisationEnCours
+}
+
+async function synchroniserFile() {
   const file = lireFileAttente()
   if (file.length === 0) return { synchronise: 0, echecs: 0 }
+  // Les anciennes versions utilisaient Date.now(), qui pouvait créer deux IDs identiques.
+  const ids = new Set()
+  const requetes = file.map(req => {
+    const id = req.id != null && !ids.has(req.id) ? req.id : identifiantRequete()
+    ids.add(id)
+    return { ...req, id }
+  })
+  try {
+    localStorage.setItem(FILE_ATTENTE_KEY, JSON.stringify(requetes))
+  } catch {
+    return { synchronise: 0, echecs: file.length }
+  }
   let synchronise = 0
   let echecs = 0
-  for (const req of file) {
+  const reussies = new Set()
+  for (const req of requetes) {
     try {
       const res = await fetch(BASE + req.chemin, {
         method: req.methode || 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-ID': idUtilisateur() },
+        headers: { 'Content-Type': 'application/json', 'X-User-ID': req.userId || idUtilisateur() },
         body: JSON.stringify(req.corps),
       })
-      if (res.ok) synchronise++
-      else echecs++
+      if (res.ok) {
+        synchronise++
+        reussies.add(req.id)
+      } else echecs++
     } catch {
       echecs++
     }
   }
-  if (echecs === 0) viderFileAttente()
+  // Relire la file préserve aussi les opérations ajoutées pendant la synchronisation.
+  const restantes = lireFileAttente().filter(req => !reussies.has(req.id))
+  if (restantes.length === 0) viderFileAttente()
+  else localStorage.setItem(FILE_ATTENTE_KEY, JSON.stringify(restantes))
   return { synchronise, echecs }
 }
