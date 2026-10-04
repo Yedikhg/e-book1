@@ -8,12 +8,13 @@ import (
 )
 
 type Arrivage struct {
-	ID               int64
-	RecuLe           time.Time
-	EffectifInitial  int
-	PrixUnitaireCts  int64
-	Notes            string
-	CreeLe           time.Time
+	ID               int64     `json:"id"`
+	RecuLe           time.Time `json:"recu_le"`
+	EffectifInitial  int       `json:"effectif_initial"`
+	Vivantes         int       `json:"vivantes"`
+	PrixUnitaireCts  int64     `json:"prix_unitaire_cts"`
+	Notes            string    `json:"notes"`
+	CreeLe           time.Time `json:"cree_le"`
 }
 
 type Part struct {
@@ -76,7 +77,7 @@ func (s *ArrivageStore) Creer(ctx context.Context, tx *sql.Tx, a NouvelArrivage)
 func (s *ArrivageStore) ListerActifs(ctx context.Context) ([]Arrivage, error) {
 	rows, err := s.db.db.QueryContext(ctx, `
 		SELECT a.id, a.recu_le, a.effectif_initial, a.prix_unitaire_cts,
-		       COALESCE(a.notes, ''), a.cree_le
+		       COALESCE(a.notes, ''), a.cree_le, ec.vivantes
 		FROM arrivages a
 		JOIN effectif_courant ec ON ec.arrivage_id = a.id
 		WHERE ec.vivantes > 0
@@ -89,7 +90,7 @@ func (s *ArrivageStore) ListerActifs(ctx context.Context) ([]Arrivage, error) {
 	var liste []Arrivage
 	for rows.Next() {
 		var a Arrivage
-		if err := rows.Scan(&a.ID, &a.RecuLe, &a.EffectifInitial, &a.PrixUnitaireCts, &a.Notes, &a.CreeLe); err != nil {
+		if err := rows.Scan(&a.ID, &a.RecuLe, &a.EffectifInitial, &a.PrixUnitaireCts, &a.Notes, &a.CreeLe, &a.Vivantes); err != nil {
 			return nil, err
 		}
 		liste = append(liste, a)
@@ -108,6 +109,7 @@ type EtatArrivage struct {
 	RecuLe          time.Time
 	EffectifInitial int
 	Vivantes        int
+	Mortalites      int
 	CoutTotalCts    int64
 	ValeurParBeteCts int64
 	Parts           []PartEtat
@@ -142,12 +144,16 @@ func (s *ArrivageStore) Etat(ctx context.Context, id int64) (*EtatArrivage, erro
 	err := s.db.db.QueryRowContext(ctx, `
 		SELECT a.id, a.recu_le, a.effectif_initial,
 		       ec.vivantes,
-		       ct.cout_total_cts
+		       ct.cout_total_cts,
+		       (SELECT COALESCE(SUM(m.nombre), 0) FROM mouvements m
+		        WHERE m.arrivage_id = a.id AND m.type = 'mortalite'
+		          AND m.annule_id IS NULL
+		          AND NOT EXISTS (SELECT 1 FROM mouvements c WHERE c.annule_id = m.id))
 		FROM arrivages a
 		JOIN effectif_courant ec ON ec.arrivage_id = a.id
 		JOIN cout_total_arrivage ct ON ct.arrivage_id = a.id
 		WHERE a.id = $1`, id,
-	).Scan(&etat.ArrivageID, &etat.RecuLe, &etat.EffectifInitial, &etat.Vivantes, &etat.CoutTotalCts)
+	).Scan(&etat.ArrivageID, &etat.RecuLe, &etat.EffectifInitial, &etat.Vivantes, &etat.CoutTotalCts, &etat.Mortalites)
 	if err == sql.ErrNoRows {
 		return nil, fmt.Errorf("arrivage %d introuvable", id)
 	}

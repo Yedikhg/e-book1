@@ -28,6 +28,7 @@ export function LeLot() {
   const d = donnees
   const vivantes = d.Vivantes ?? d.vivantes ?? 0
   const effectifInitial = d.EffectifInitial ?? d.effectif_initial ?? 0
+  const mortalites = d.Mortalites ?? d.mortalites ?? 0
   const coutTotal = d.CoutTotalCts ?? d.cout_total_cts ?? 0
   const valeurParBete = d.ValeurParBeteCts ?? d.valeur_par_bete_cts ?? 0
   const parts = d.Parts ?? d.parts ?? []
@@ -85,7 +86,7 @@ export function LeLot() {
           <p className="etiquette">Mortalité</p>
           <p className="valeur">
             {effectifInitial > 0
-              ? `${(((effectifInitial - vivantes) / effectifInitial) * 100).toFixed(1)} %`
+              ? `${((mortalites / effectifInitial) * 100).toFixed(1)} %`
               : '—'}
           </p>
         </div>

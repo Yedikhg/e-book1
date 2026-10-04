@@ -2,6 +2,13 @@
 
 Le code de l’application se trouve dans le dossier **[`elevage-app/`](./elevage-app/)**. Ouvre ce dossier pour accéder au frontend, à l’API Go, aux migrations PostgreSQL et aux scripts du projet.
 
+## Application en ligne
+
+- **Interface :** https://elevage-demo-frontend.onrender.com
+- **API :** https://elevage-demo-api.onrender.com/api/sante
+
+Version de démonstration publique avec données fictives et partagées. Les arrivages, mortalités, ventes et encaissements sont enregistrés dans PostgreSQL. Le PIN initial de démonstration est `0000`. Les services gratuits peuvent mettre un moment à redémarrer après inactivité. La base gratuite actuelle expire le **31 octobre 2026** : une sauvegarde et une migration ou un renouvellement seront nécessaires pour conserver les données et la disponibilité après cette date.
+
 ## À quoi sert l’application ?
 
 Cette application web aide à suivre l’activité d’un élevage : arrivages, lots, ventes, paiements et mortalités. Elle comprend une interface React, une API écrite en Go et une base PostgreSQL.
@@ -79,6 +86,6 @@ Le fichier Vite configure déjà le relais des appels `/api` vers l’API locale
 
 ## État du projet et sécurité
 
-Le dépôt contient le code source de l’application; cela ne signifie pas encore que l’application est déployée. Le contrôle d’utilisateur actuel repose sur l’en-tête `X-User-ID` et une valeur de test par défaut. **N’utilise pas cette version avec des données réelles ou confidentielles avant d’ajouter une authentification et des contrôles d’accès adaptés.**
+L’application est déployée aux adresses ci-dessus en démonstration publique. Le contrôle d’utilisateur actuel repose sur l’en-tête `X-User-ID` et une valeur de test par défaut. **N’utilise pas cette version avec des données réelles ou confidentielles avant d’ajouter une authentification et des contrôles d’accès adaptés.**
 
 Ne publie jamais de vrais mots de passe ou clés dans GitHub.
