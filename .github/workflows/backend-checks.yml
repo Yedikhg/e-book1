@@ -1,0 +1,31 @@
+name: Elevage backend checks
+
+on:
+  push:
+    branches: [main, claude/gallant-goodall-yrld3u]
+    paths:
+      - 'elevage-app/backend/**'
+      - '.github/workflows/backend-checks.yml'
+  pull_request:
+    paths:
+      - 'elevage-app/backend/**'
+      - '.github/workflows/backend-checks.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  tests-and-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: elevage-app/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: elevage-app/backend/go.mod
+          cache-dependency-path: elevage-app/backend/go.sum
+      - run: go test ./...
+      - run: go build -o /tmp/elevage-api ./cmd/api/main.go
+      - run: go build -o /tmp/elevage-migrate ./cmd/migrate
